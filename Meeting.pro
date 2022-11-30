@@ -13,18 +13,27 @@ SOURCES += \
     login_dialog.cpp \
     main.cpp \
     main_dialog.cpp \
-    room_dialog.cpp
+    room_dialog.cpp \
+    set_user.cpp \
+    user_show.cpp \
+    work_thread.cpp
 
 HEADERS += \
     kernel.h \
     login_dialog.h \
     main_dialog.h \
-    room_dialog.h
+    room_dialog.h \
+    set_user.h \
+    user_show.h \
+    work_thread.h
+
 
 FORMS += \
     login_dialog.ui \
     main_dialog.ui \
-    room_dialog.ui
+    room_dialog.ui \
+    set_user.ui \
+    user_show.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -34,9 +43,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 include(./netapi/netapi.pri)
 include(./MD5/MD5.pri)
 include(./uiapi/uiapi.pri)
+include(./AudioApi/AudioApi.pri)
+include(./VideoApi/videoapi.pri)
 
 INCLUDEPATH += ./netapi/\
             ./MD5/\
-            ./uiapi/
+            ./uiapi/\
+            ./AudioApi\
+            ./VideoApi
+
 RESOURCES += \
     source.qrc

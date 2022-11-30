@@ -36,6 +36,12 @@ void main_dialog::setinfo(int icon, QString name)
     //对资源的引用 :/xx/xx.xx
     ui->pb_icon->setIcon(QIcon(QString(":/resource/tx/%1.png").arg(icon)));
 }
+
+void main_dialog::push_button_enable(bool flag)
+{
+    ui->pb_join_meeting->setEnabled(flag);
+    ui->pb_create_meeting->setEnabled(flag);
+}
 //---------------------------------ui界面槽函数--------------------------------------
 void main_dialog::on_pb_min_window_clicked()
 {
@@ -58,5 +64,11 @@ void main_dialog::on_pb_join_meeting_clicked()
 void main_dialog::on_pb_create_meeting_clicked()
 {
     Q_EMIT signal_create_meeting();
+}
+
+//点击头像设置个人信息
+void main_dialog::on_pb_icon_clicked()
+{
+    Q_EMIT signal_set_info();
 }
 

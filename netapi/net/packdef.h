@@ -31,14 +31,15 @@
 //退出房间请求
 #define DEF_PACK_LEAVEROOM_RQ   (DEF_PACK_BASE + 11)
 //退出房间回复
-#define DEF_PACK_LEAVEROOM_RS   (DEF_PACK_BASE + 12)
+//#define DEF_PACK_LEAVEROOM_RS   (DEF_PACK_BASE + 12)
 //音频注册
 #define DEF_PACK_AUDIO_REGISTER (DEF_PACK_BASE + 13)
 //视频注册
 #define DEF_PACK_VIDEO_REGISTER (DEF_PACK_BASE + 14)
 //用户信息
 #define DEF_PACK_USER_INFO    DEF_PACK_BASE + 15
-
+//用户下线
+#define DEF_PACK_USER_OFFLINE DEF_PACK_BASE+16
 
 //返回的结果
 //注册请求结果
@@ -132,19 +133,20 @@ typedef struct STRU_LOGIN_RS
 }STRU_LOGIN_RS;
 
 //用户信息
-typedef struct STRU_USER_INFO
+typedef struct STRU_USER_INFO_RQ
 {
-    STRU_USER_INFO():type(DEF_PACK_USER_INFO) , userid(0) , iconid(0)
+    STRU_USER_INFO_RQ():type(DEF_PACK_USER_INFO) , userid(0) , iconid(0)
     {
         memset( name ,  0 , sizeof(name) );
+        memset( feeling ,  0 , sizeof(feeling) );
     }
     //需要 用户id 头像id 昵称 签名 状态--是否在线
     PackType type;
     int userid;
     int iconid;
     char name[_MAX_SIZE];
-
-}STRU_USER_INFO;
+    char feeling[_MAX_SIZE];
+}STRU_USER_INFO_RQ;
 
 ////添加好友
 //typedef struct STRU_ADD_FRIEND_RQ
@@ -310,6 +312,7 @@ typedef struct STRU_ROOM_MEMBER_RQ
     }
     PackType m_nType;   //包类型
     int m_UserID;
+    int m_icon;
     char m_szUser[_MAX_SIZE];
 
 }STRU_ROOM_MEMBER_RQ;
@@ -354,6 +357,16 @@ struct STRU_VIDEO_REGISTER
     PackType m_nType;   //包类型
     int m_userid;
 };
+
+//下线数据包
+struct STRU_OFFLINE
+{
+    STRU_OFFLINE():m_nType(DEF_PACK_USER_OFFLINE) {}
+
+    PackType m_nType;
+    int m_userid;
+};
+
 
 ///音频数据帧
 /// 成员描述

@@ -21,15 +21,18 @@ public:
     void closeEvent(QCloseEvent* event);
 
     void setinfo(int icon, QString name);
-
+    //按键失效
+    void push_button_enable(bool flag);
 
 signals:
     void signal_close();
     //加入会议
     void signal_join_meeting();
-
     //创建会议
     void signal_create_meeting();
+    //设置信息
+    void signal_set_info();
+
 private slots:
     //void on_pushButton_2_clicked();
     //------------------------------ui自动生成槽函数--------------------
@@ -43,7 +46,7 @@ private slots:
 
     //--------------------自定义槽函数
 
-
+    void on_pb_icon_clicked();
 
 private:
     Ui::main_dialog *ui;

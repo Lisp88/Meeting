@@ -97,6 +97,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="text">
+      <string>18222222222</string>
+     </property>
     </widget>
     <widget class="QLineEdit" name="le_login_password">
      <property name="geometry">
@@ -106,6 +109,9 @@
        <width>161</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="text">
+      <string>2</string>
      </property>
     </widget>
     <widget class="QPushButton" name="pb_login">
