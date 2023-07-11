@@ -17,13 +17,10 @@ void FaceDetect::FaceDetectInit()
     // 将 xml 文件放在 exe 同级的目录下面
      QString face_cascade_name = QCoreApplication::applicationDirPath()
      +"/haarcascade_frontalface_default.xml";
-     //+"/haarcascade_frontalface_alt_tree.xml";
-     //+ "/lbpcascade_frontalface.xml" ;
-     //"haarcascade_frontalface_alt.xml" //lbpcascade_frontalface.xml;
+
      QString eyes_cascade_name = QCoreApplication::applicationDirPath()
       +"/haarcascade_eye.xml";
-     //+"/haarcascade_eye_tree_eyeglasses.xml";
-     //haarcascade_eye_tree_eyeglasses.xml;
+
      // 根据路径加载 xml 文件
      qDebug() << face_cascade_name;
      //-- 1. Load the cascade
@@ -74,17 +71,6 @@ void FaceDetect::detectAndDisplay(Mat &frame, std::vector<Rect> &faces)
                 ite = faces.erase(ite);
                 continue;
             }
-            // ellipse( frame, center, Size( rct.width*0.5, rct.height*0.5), 0, 0, 360,
-            //Scalar( 255, 0, 255 ), 4, 8, 0 );
-            // Rect rctnose;
-            // rctnose.x = nose[0].x + rct.x;
-            // rctnose.y = nose[0].y + rct.y;
-            // rctnose.width = nose[0].width;
-            // rctnose.height = nose[0].height;
-            // Point nosecenter( rctnose.x + rctnose.width*0.5, rctnose.y
-            //+rctnose.height*0.5 );
-            // ellipse( frame, nosecenter, Size( rctnose.width*0.5,
-            //rctnose.height*0.5),0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
             ++ite;
         }
     }

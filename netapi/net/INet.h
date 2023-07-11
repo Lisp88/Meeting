@@ -1,23 +1,20 @@
 #pragma once
 
 #include<winsock2.h>
-
-//加载动态库的引入库
-//#pragma comment(lib, "ws2_32.lib")  vs 特定的
 #include<ws2tcpip.h>
 #include<process.h>
 
 //#include"packdef.h"
 #include<string>
 #include<set>
-
+#include <thread>
 
 class INetMediator;
-class INet
-{
+
+class INet{
 public:
-	INet(){}
-	virtual ~INet(){} //使用时, 父类指针指向子类, 使用虚析构
+    INet(){}
+    virtual ~INet(){} //使用时, 父类指针指向子类, 使用虚析构
 	//初始化网络
     virtual bool InitNet(const char* szBufIP , unsigned short port) = 0 ;
 	//关闭网络

@@ -15,6 +15,7 @@ signals:
     void signal_close();
     void signal_register(QString name, QString tel, QString password);//接收页面注册响应
     void signal_login(QString name, QString password);//接收页面登录响应
+//    void test();
 public:
     explicit login_dialog(QWidget *parent = nullptr);
     ~login_dialog();

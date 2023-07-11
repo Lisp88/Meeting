@@ -110,6 +110,7 @@ void login_dialog::on_pb_login_clicked()
         return;
     }
     Q_EMIT signal_login(tel, password);
+//    Q_EMIT test();
 }
 
 

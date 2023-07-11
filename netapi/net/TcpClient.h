@@ -20,11 +20,14 @@ public:
 protected:
 	static unsigned int __stdcall RecvThread( void * lpvoid);
 
+    static void recvThread(void *arg);
+
 	//接收
 	virtual void RecvData();
 	SOCKET m_sock;
 	HANDLE m_hThreadHandle; // 控制接收线程
 	bool m_isStop;
     bool m_isConnected;
+    std::thread *m_t_recv;
 };
 

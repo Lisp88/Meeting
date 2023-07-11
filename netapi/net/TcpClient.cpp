@@ -20,12 +20,9 @@ bool TcpClient::InitNet(const char *szBufIP, unsigned short port)
 {
     if( !m_isLoadlib )
     {
-        //1.做个小买卖 炸串 --加载库
         WORD wVersionRequested;
         WSADATA wsaData;
         int err;
-
-    /* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
         wVersionRequested = MAKEWORD(2, 2);
 
         err = WSAStartup(wVersionRequested, &wsaData);
@@ -42,7 +39,7 @@ bool TcpClient::InitNet(const char *szBufIP, unsigned short port)
 
     m_isConnected = false;
 
-	//2.雇人-- 创建套接字 进程与外界网络通信需要的接口 决定了与外界通讯的方式(tcp udp)
+    //创建套接字 进程与外界网络通信需要的接口 决定了与外界通讯的方式(tcp udp)
 	m_sock = socket( AF_INET , SOCK_STREAM , IPPROTO_TCP ); // ipv4 udp
 	if ( m_sock == INVALID_SOCKET) {
 		WSACleanup();
@@ -81,19 +78,22 @@ bool TcpClient::InitNet(const char *szBufIP, unsigned short port)
 
     m_isConnected = true;
 	// 收数据 -- 创建线程 CreateThread  WinAPI  strcpy  C/C++ RunTime 库函数 创建内存块
-	m_hThreadHandle = (HANDLE)_beginthreadex(  NULL, 0 ,&RecvThread ,this , 0 , NULL );     //( CreateThread 创建内存块 )
+//	m_hThreadHandle = (HANDLE)_beginthreadex(  NULL, 0 ,&RecvThread ,this , 0 , NULL );     //( CreateThread 创建内存块 )
 	//_endthreadex(); -- 回收内存块      //( ExitThread 不回收内存块 ) --内存泄露
-
+    m_t_recv = new std::thread(recvThread, (void*)this);
+    m_t_recv->detach();
 	return true;
 }
 
-unsigned int __stdcall TcpClient::RecvThread( void * lpvoid)
-{
-	TcpClient* pthis = (TcpClient*) lpvoid;
-	pthis->RecvData();
+//unsigned int __stdcall TcpClient::RecvThread( void * lpvoid)
+//{
+//	TcpClient* pthis = (TcpClient*) lpvoid;
+//	pthis->RecvData();
 	
-	return 0;
-}
+//	return 0;
+//}
+
+
 
 //关闭网络
 void TcpClient::UnInitNet()
@@ -117,20 +117,13 @@ void TcpClient::UnInitNet()
         m_isLoadlib = false;
     }
 } 
-//发送 : 同时兼容tcp udp 
+
+//发送
 bool TcpClient::SendData(unsigned int lSendIP , char* szbuf , int nlen )
 {
     if( !szbuf|| nlen <= 0 ) return false;
 
 	//防止粘包  策略: 先发包大小 再发数据包
-	// m_sock  <--> lSendIP
-/*	send( m_sock , (char*)&nlen , sizeof(int) , 0  );
-
-	if( send( m_sock , buf , nlen , 0  ) <= 0 )
-		return false;
-	
-	return true;
-*/
 
     lSendIP = m_sock;
 
@@ -138,7 +131,6 @@ bool TcpClient::SendData(unsigned int lSendIP , char* szbuf , int nlen )
     std::vector<char> vecbuf;
     vecbuf.resize( DataLen );
 
- //   char* buf = new char[ DataLen ];
     char* buf = &*vecbuf.begin();
     char* tmp = buf;
     *(int*) tmp = nlen;
@@ -150,8 +142,8 @@ bool TcpClient::SendData(unsigned int lSendIP , char* szbuf , int nlen )
 //    delete[] buf;
     return res;
 }
-//接收
 
+//接收
 void TcpClient::RecvData()
 {
 	int nPackSize = 0; // 存储包大小
@@ -209,5 +201,11 @@ void TcpClient::RecvData()
 bool TcpClient::IsConnected()
 {
     return  m_isConnected;
+}
+
+void TcpClient::recvThread(void *arg)
+{
+    TcpClient* p = static_cast<TcpClient*>(arg);
+    p->RecvData();
 }
 

@@ -10,7 +10,7 @@ public:
 	~TcpClientMediator(void);
 
 	//初始化网络
-    bool OpenNet(const char* szBufIP = "0.0.0.0"
+    bool OpenNet(const char* szBufIP = _DEF_SERVER_IP
                     , unsigned short port = _DEF_TCP_PORT );
 	//关闭网络
 	void CloseNet(); 

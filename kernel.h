@@ -20,6 +20,7 @@
 #include "ui_user_show.h"
 #include "desk_read.h"
 #include "work_thread.h"
+#include "chat_dialog.h"
 
 //为优化主线程send为槽函数，发送数据量大造成的 主线程卡顿 ，使用工作者线程来进行图片数据的发送
 class SendThread_Video : public work_thread{
@@ -86,6 +87,9 @@ public:
 
     void deal_video_data(char* buf, int nlen);
 
+    void deal_chat_rs(char* buf, int nlen);
+
+    void deal_chat_rq(char* buf, int nlen);
 signals:
     void signal_send_video(unsigned int lSendIP , char* buf , int nlen);
     void signal_send_audio(unsigned int lSendIP , char* buf , int nlen);
@@ -128,6 +132,10 @@ public slots:
     void slot_refresh_vedio(QImage img);
     //设置萌拍
     void slot_pic_set(int id);
+    //开启聊天页面
+    void slot_open_chat();
+    //发送聊天信息
+    void slot_send_chat(QString text);
 public:
 
     //初始化配置文件
@@ -149,11 +157,12 @@ private:
     INetMediator*       mp_client;
     room_dialog*        mp_room;
     set_user*           mp_set_user;
+    chat_dialog*        mp_chat_dialog;
     //个人信息
     int m_user_id;
     int m_room_id;
     int m_icon;
-    //QString m_name;
+    QString m_name;
     QString m_server_ip;
     //---协议包映射处理函数---
     typedef void (Kernel::*P_FUN)(char*, int);

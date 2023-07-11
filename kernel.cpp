@@ -11,6 +11,7 @@ Kernel::Kernel(QObject *parent) : QObject(parent), m_user_id(0), m_room_id(0), m
     mp_audio_read = new Audio_Read;
     mp_video_read = new Video_Read;
     mp_desk_read = new Desk_Read;
+    mp_chat_dialog = new chat_dialog;
     m_tcpAV[0] = new TcpClientMediator;
     m_tcpAV[1] = new TcpClientMediator;
     //加载配置文件
@@ -61,6 +62,10 @@ Kernel::Kernel(QObject *parent) : QObject(parent), m_user_id(0), m_room_id(0), m
     connect(mp_room, SIGNAL(signal_desk_close()), mp_desk_read, SLOT(pause()));
     //萌拍id
     connect(mp_room, SIGNAL(signal_pic_id(int)), this, SLOT(slot_pic_set(int)));
+    //开启聊天页面
+    connect(mp_room, SIGNAL(signal_open_chat()), this, SLOT(slot_open_chat()));
+    //聊天发送信息
+    connect(mp_chat_dialog, SIGNAL(signal_send_info(QString)), this, SLOT(slot_send_chat(QString)));
     //工作线程发送视频数据
     connect(this, SIGNAL(signal_send_video(uint,char*,int)), mp_send_video.get(), SLOT(slot_thread_send_data(uint,char*,int)));
     connect(this, SIGNAL(signal_send_audio(uint,char*,int)), mp_send_audio.get(), SLOT(slot_thread_send_data(uint,char*,int)));
@@ -70,7 +75,6 @@ Kernel::Kernel(QObject *parent) : QObject(parent), m_user_id(0), m_room_id(0), m
     m_tcpAV[0]->OpenNet(m_server_ip.toStdString().c_str());
     m_tcpAV[1]->OpenNet(m_server_ip.toStdString().c_str());
 }
-
 void Kernel::set_net_pack_map() {
     //NET_PACK_MAP(_DEF_TCP_LOGIN_RQ) = &Kernel::deal_login_data;
     //处理注册和登录服务器回复
@@ -88,6 +92,9 @@ void Kernel::set_net_pack_map() {
     //处理接收音频视频
     NET_PACK_MAP(DEF_PACK_AUDIO_FRAME) = &Kernel::deal_audio_data;
     NET_PACK_MAP(DEF_PACK_VIDEO_FRAME) = &Kernel::deal_video_data;
+    //聊天
+    NET_PACK_MAP(DEF_PACK_CHAT_RS) = &Kernel::deal_chat_rs;
+    NET_PACK_MAP(DEF_PACK_CHAT_RQ) = &Kernel::deal_chat_rq;
 }
 
 
@@ -124,7 +131,6 @@ bool Kernel::Video_SendData(unsigned int lSendIP, char *buf, int nlen)
 Kernel::slot_data_deal(unsigned int lSendIP, char *buf, int nlen)
 {
     int type = *(int* )buf;
-    //qDebug()<<"recv data type: "<<type;
     P_FUN p_fun = NET_PACK_MAP(type);
     if(p_fun)
         (this->*p_fun)(buf, nlen);
@@ -232,9 +238,11 @@ void Kernel::deal_register_rs(char *buf, int nlen)
     switch (register_rs->result) {
     case tel_is_exist:
         QMessageBox::about(mp_login_dialog, "注册提示", "该用户已存在，请重新输入其他手机号");
+        m_name.clear();
         break;
     case name_is_exist:
         QMessageBox::about(mp_login_dialog, "注册提示", "该用户名已存在，请重新输入其他用户名");
+        m_name.clear();
         break;
     case register_success:
         QMessageBox::about(mp_login_dialog, "注册提示", "注册成功");
@@ -333,6 +341,7 @@ void Kernel::deal_update_info(char *buf, int nlen)
     //更新ui
     m_icon = rq->iconid;
     QString name = QString::fromStdString(rq->name);
+    m_name = name;
     mp_main_dialog->setinfo(rq->iconid, name);
     //更新设置ui
     mp_set_user->set_info(rq->iconid, name, QString::fromStdString(rq->feeling));
@@ -367,7 +376,7 @@ void Kernel::slot_register(QString name, QString tel, QString password)
     strcpy(register_request.name, std_name.c_str());
     strcpy(register_request.tel, std_tel.c_str());
     strcpy(register_request.password, std_password.c_str());
-
+    m_name = name;
 
 
     SendData(0, (char*)&register_request, sizeof(register_request));
@@ -440,7 +449,7 @@ void Kernel::slot_commit_info(int icon_id, QString name, QString feeling)
     rq.userid = m_user_id;
     strcpy(rq.name, str_name.c_str());
     strcpy(rq.feeling, str_feeling.c_str());
-
+    m_name = name;
     SendData(0, (char*)&rq, sizeof(rq));
 }
 
@@ -471,6 +480,7 @@ void Kernel::slot_quit_meeting()
         ite = m_user_TO_audio_map.erase(ite);
         delete user;
     }
+    mp_chat_dialog->close_chat();
 }
 
 void Kernel::slot_audio_open()
@@ -515,6 +525,26 @@ void Kernel::slot_pic_set(int id)
 {
     mp_video_read->set_pic_id(id);
 }
+
+void Kernel::slot_open_chat()
+{
+    mp_chat_dialog->show();
+}
+
+//发送聊天信息
+void Kernel::slot_send_chat(QString text)
+{
+    qDebug() << "封包，发送";
+    mp_chat_dialog->add_info(m_icon, m_name, text);
+    STRU_CHAT_RQ rq;
+    rq.userid = m_user_id;
+    rq.roomid = m_room_id;
+    rq.iconid = m_icon;
+    strcpy_s(rq.name, m_name.toStdString().c_str());
+    strcpy_s(rq.content, text.toStdString().c_str());
+    SendData(0, (char*)&rq, sizeof(rq));
+}
+
 #include <QDebug>
 //显示某个用户
 void Kernel::refresh_user_image(int id, QImage& img)
@@ -674,6 +704,26 @@ void Kernel::deal_video_data(char *buf, int nlen)
     QImage img;
     img.loadFromData((const uchar*)temp, nlen - (7*sizeof(int)));
     refresh_user_image(user_id, img);
+}
+#include <QMessageBox>
+void Kernel::deal_chat_rs(char *buf, int nlen)
+{
+    STRU_CHAT_RS* rs = (STRU_CHAT_RS*)buf;
+    if(rs->result != 0){
+        QMessageBox::about(mp_chat_dialog, "提示", "信息发送失败");
+    }
+}
+
+void Kernel::deal_chat_rq(char *buf, int nlen)
+{
+    STRU_CHAT_RQ* rq = (STRU_CHAT_RQ*)buf;
+    qDebug() << "deal chat rq ";
+    if(rq->roomid == m_room_id){
+        int icon_id = rq->iconid;
+        QString text(rq->content);
+        QString name(rq->name);
+        mp_chat_dialog->add_info(icon_id, name, text);
+    }
 }
 //问题
 //1 当音频和视频同时开着时导致卡顿（视频数据过大）：原因:TCP滑动窗口阻塞，解决方法：分开进行TCP发送

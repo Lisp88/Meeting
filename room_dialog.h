@@ -5,6 +5,8 @@
 #include <QVBoxLayout>//做垂直布局
 #include "customwidget.h"
 #include "user_show.h"
+#include "chat_dialog.h"
+
 namespace Ui {
 class room_dialog;
 }
@@ -42,6 +44,8 @@ signals:
     void signal_desk_open();
 
     void signal_pic_id(int id);
+
+    void signal_open_chat();
 public slots:
     void slot_set_big_image_info(int user_id, QString name);
 private slots:
@@ -63,9 +67,12 @@ private slots:
 
     void on_cbx_lvjing_currentIndexChanged(int index);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::room_dialog *ui;
     QVBoxLayout* m_user_layout;
+    chat_dialog* m_chat_dialog;
 };
 
 #endif // ROOM_DIALOG_H

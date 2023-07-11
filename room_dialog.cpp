@@ -16,7 +16,7 @@ room_dialog::room_dialog(QWidget *parent) :
     m_user_layout->setSpacing(5);//控件之间距离
 
     //添加测试user 因为room页面包含该控件，所以不用引入头文件
-
+//    m_chat_dialog = new chat_dialog;
 }
 
 room_dialog::~room_dialog()
@@ -52,6 +52,7 @@ void room_dialog::room_clear()
     Q_EMIT signal_video_close();
     Q_EMIT signal_desk_close();
 }
+
 #include <QDebug>
 void room_dialog::set_big_image(int user_id, QImage& img)
 {
@@ -157,5 +158,11 @@ void room_dialog::on_cb_desk_clicked()
 void room_dialog::on_cbx_lvjing_currentIndexChanged(int index)
 {
     if(index) Q_EMIT signal_pic_id(index);
+}
+
+
+void room_dialog::on_pushButton_clicked()
+{
+    Q_EMIT signal_open_chat();
 }
 

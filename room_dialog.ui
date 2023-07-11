@@ -99,7 +99,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="source.qrc">
+         <iconset>
           <normaloff>:/resource/images/down.png</normaloff>:/resource/images/down.png</iconset>
         </property>
         <property name="iconSize">
@@ -381,6 +381,18 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>聊天</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="th">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -418,8 +430,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="source.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

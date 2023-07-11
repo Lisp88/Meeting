@@ -2,9 +2,8 @@
 
 #include<QObject>
 
-#define _DEF_TCP_PORT  (8000)
-#define _DEF_UDP_PORT  (1234)
-#define _DEF_SERVER_IP ("192.168.52.129")
+#define _DEF_TCP_PORT  8000
+#define _DEF_SERVER_IP "192.168.52.129"
 
 class INet;
 class INetMediator : public QObject
@@ -18,11 +17,11 @@ public:
     INetMediator();
     ~INetMediator();//使用时, 父类指针指向子类, 使用虚析构
 	//初始化网络
-    virtual bool OpenNet( const char* szBufIP = "0.0.0.0"
+    virtual bool OpenNet( const char* szBufIP = _DEF_SERVER_IP
                     , unsigned short port = _DEF_TCP_PORT ) = 0 ;
 
 	//关闭网络
-	virtual void CloseNet() = 0 ; 
+    virtual void CloseNet() = 0;
 	//发送 : 同时兼容tcp udp 
     virtual bool SendData( unsigned int lSendIP , char* buf , int nlen ) = 0;
     //接收 处理

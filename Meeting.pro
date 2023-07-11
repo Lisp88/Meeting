@@ -9,6 +9,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    chat_dialog.cpp \
+    chat_info_widget.cpp \
     kernel.cpp \
     login_dialog.cpp \
     main.cpp \
@@ -19,6 +21,8 @@ SOURCES += \
     work_thread.cpp
 
 HEADERS += \
+    chat_dialog.h \
+    chat_info_widget.h \
     kernel.h \
     login_dialog.h \
     main_dialog.h \
@@ -29,6 +33,8 @@ HEADERS += \
 
 
 FORMS += \
+    chat_dialog.ui \
+    chat_info_widget.ui \
     login_dialog.ui \
     main_dialog.ui \
     room_dialog.ui \

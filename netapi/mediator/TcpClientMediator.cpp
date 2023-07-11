@@ -42,7 +42,7 @@ bool TcpClientMediator::SendData( unsigned int lSendIP , char* buf , int nlen )
         m_pNet = new TcpClient(this);
         if( this->OpenNet( m_szBufIP , m_port ) )
         {
-            return m_pNet->SendData( 0,buf,nlen);
+            return m_pNet->SendData( lSendIP,buf,nlen);
         }
         else
         {
